@@ -1,0 +1,7 @@
+name             'oauth2-proxy'
+maintainer       'Tom Robison'
+maintainer_email 'thomas.robison@gmail.com'
+license          'MIT'
+description      'Installs/Configures oauth2-proxy'
+long_description 'Installs/Configures oauth2-proxy'
+version          '0.1.0'
