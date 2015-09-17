@@ -1,13 +1,32 @@
 # oauth2-proxy cookbook
+[![Build Status](https://travis-ci.org/tomrobison/oauth2-proxy-cookbook.svg)](https://travis-ci.org/tomrobison/oauth2-proxy-cookbook)
+
+# Requirements
+
+# Usage
+
+# Attributes
+
+# Recipes
+
+## Contributing
+
+- Fork the repository on Github
+- Create a named feature branch (like `add_component_x`)
+- Write your change
+- Write tests for your change (if applicable)
+- Run the tests, ensuring they all pass
+- Submit a Pull Request using Github
 
 ## License
 
-All files in the repository are licensed under the Apache 2.0 license. If any
-file is missing the License header it should assume the following is attached;
+oauth2-proxy cookbook
 
-```
-Copyright 2015 Tom Robison
+- Tom Robison (<thomas.robison@gmail.com>)
+- Copyright:: Copyright (c) 2015 Tom Robison
+- License:: Apache License, Version 2.0
 
+```text
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -20,15 +39,3 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ```
-
-# Requirements
-
-# Usage
-
-# Attributes
-
-# Recipes
-
-# Authors
-
-* Tom Robison (<thomas.robison@gmail.com>)
