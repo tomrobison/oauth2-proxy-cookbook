@@ -1,2 +1,14 @@
+Metrics/AbcSize:
+  Max: 40
+
+Metrics/LineLength:
+  Max: 120
+
+Metrics/MethodLength:
+  Max: 30
+
 Style/SingleSpaceBeforeFirstArg:
+  Enabled: false
+
+Style/Documentation:
   Enabled: false
