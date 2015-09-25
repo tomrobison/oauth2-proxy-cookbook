@@ -1,5 +1,5 @@
 # Cookbook Name:: oauth2-proxy
-# Resource/Provider:: install
+# Resource/Provider:: configure
 # Author:: Tom Robison
 # License:: Apache 2.0
 #
@@ -9,10 +9,10 @@ require 'poise'
 
 class Chef
   class Resource
-    class Oauth2ProxyInstall < Resource
+    class Oauth2ProxyService < Resource
       include Poise
 
-      provides(:oauth2_proxy_install)
+      provides(:oauth2_proxy_configure)
 
       actions(:create)
 
@@ -25,50 +25,45 @@ class Chef
       attribute(:os, kind_of: String, default: 'linux')
       attribute(:kernel_machine, kind_of: String, default: 'amd64')
       attribute(:go_version, kind_of: String, default: '1.4.2')
+      attribute(:template_cookbook, kind_of: String, default: 'oauth2-proxy')
+      attribute(:run_template, kind_of: String, default: 'oauth2_proxy')
+      attribute(:log_template, kind_of: String, default: 'oauth2_proxy')
     end
   end
 
   class Provider
-    class Oauth2ProxyInstall < Provider
+    class Oauth2ProxyService < Provider
       include Poise
       include Chef::DSL::Recipe
 
       def action_create
-        converge_by("create resource #{new_resource.name}_oauth2_proxy") do
+        converge_by("configure service for #{new_resource.name}_oauth2_proxy") do
           notifying_block do
-            proxy = proxy_properties
+            proxy = service_properties
 
-            log "Installing #{proxy[:name]}_oauth2_proxy"
+            log "Add service #{proxy[:name]}_oauth2_proxy"
 
-            directory proxy[:install_dir] do
-              recursive true
-              owner proxy[:user]
-              group proxy[:group]
-              mode '0755'
-            end
+            @run_context.include_recipe 'runit::default'
 
             library_version = "#{proxy[:library]}-#{proxy[:version]}"
             proxy_distribution = "#{proxy[:os]}-#{proxy[:kernel_machine]}.go#{proxy[:go_version]}"
-            temp_file = "#{library_version}.#{proxy_distribution}.tar.gz"
+
             proxy_binary = "#{proxy[:install_dir]}/#{library_version}.#{proxy_distribution}/#{proxy[:library]}"
 
-            file_url_basepath = "https://github.com/bitly/oauth2_proxy/releases/download/v#{proxy[:version]}"
-            file_checksum = 'c6d8f6d74e1958ce1688f3cf7d60648b9d0d6d4344d74c740c515a00b4e023ad'
-            temp_path = Chef::Config[:file_cache_path]
+            proxy_command = "#{proxy_binary} -config=#{proxy[:install_dir]}/#{proxy[:name]}.conf"
 
-            remote_file "#{temp_path}/#{temp_file}" do
-              checksum file_checksum
-              source "#{file_url_basepath}/#{temp_file}"
-              action [:create]
-            end
-
-            @run_context.include_recipe 'libarchive::default'
-            libarchive_file temp_file do
-              path "#{temp_path}/#{temp_file}"
-              extract_to proxy[:install_dir]
+            runit_service "#{proxy[:name]}_oauth2_proxy" do
               owner proxy[:user]
-              action [:extract]
-              not_if { ::File.exist?(proxy_binary) }
+              group proxy[:group]
+
+              cookbook proxy[:template_cookbook]
+              run_template_name proxy[:run_template]
+              log_template_name proxy[:log_template]
+
+              options(
+                user: proxy[:user],
+                command: proxy_command
+              )
             end
           end
         end
@@ -77,7 +72,7 @@ class Chef
 
     private
 
-    def proxy_properties
+    def service_properties
       {
         name: new_resource.name,
         user: new_resource.user,
@@ -87,7 +82,10 @@ class Chef
         version: new_resource.version,
         os: new_resource.os,
         kernel_machine: new_resource.kernel_machine,
-        go_version: new_resource.go_version
+        go_version: new_resource.go_version,
+        template_cookbook: new_resource.template_cookbook,
+        run_template: new_resource.run_template,
+        log_template: new_resource.log_template
       }
     end
   end
