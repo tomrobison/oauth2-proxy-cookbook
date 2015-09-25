@@ -21,6 +21,8 @@ class Chef
       attribute(:group, kind_of: String, default: 'oauth2_proxy')
       attribute(:install_dir, kind_of: String, default: '/opt/oauth2_proxy')
       attribute(:parameters, kind_of: Hash, default: {})
+      attribute(:source, kind_of: String, default: 'basic.conf.erb')
+      attribute(:source_cookbook, kind_of: String, default: 'oauth2-proxy')
     end
   end
 
@@ -32,7 +34,7 @@ class Chef
       def action_create
         converge_by("configure resource #{new_resource.name}_oauth2_proxy") do
           notifying_block do
-            proxy = proxy_properties
+            proxy = configure_properties
 
             log "Configuring #{proxy[:name]}_oauth2_proxy"
 
@@ -44,12 +46,14 @@ class Chef
             end
 
             template "#{proxy[:install_dir]}/#{proxy[:name]}.conf" do
+              source proxy[:source]
+              cookbook proxy[:source_cookbook]
               owner proxy[:user]
               group proxy[:group]
               mode '0755'
-              variables({
+              variables(
                 oauth2_proxy: proxy[:parameters]
-              })
+              )
             end
           end
         end
@@ -58,13 +62,15 @@ class Chef
 
     private
 
-    def proxy_properties
+    def configure_properties
       {
         name: new_resource.name,
         user: new_resource.user,
         group: new_resource.group,
         install_dir: new_resource.install_dir,
-        parameters: new_resource.parameters
+        parameters: new_resource.parameters,
+        source: new_resource.source,
+        source_cookbook: new_resource.source_cookbook
       }
     end
   end
