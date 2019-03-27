@@ -11,5 +11,5 @@ platforms:
 suites:
   - name: default
     run_list:
-      - recipe[oauth2-proxy::default]
+      - recipe[oauth2-proxy::example]
     attributes:

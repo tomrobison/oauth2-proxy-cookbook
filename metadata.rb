@@ -5,3 +5,7 @@ license          'MIT'
 description      'Installs/Configures oauth2-proxy'
 long_description 'Installs/Configures oauth2-proxy'
 version          '0.1.0'
+
+depends 'poise'
+depends 'libarchive'
+depends 'runit'
